@@ -1,3 +1,9 @@
+/*This entity represents the role of a user in the system
+* Example roles:-
+* -ADMIN -> can manage products, categoires, and orders.
+* -USER -> can browse products, categories, add items to cart, and place orders.
+*  */
+
 package com.dreamcart.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,6 +25,6 @@ public class Role {
     @Column(nullable = false, unique = true, length = 50)
     private String name;
 
-    @OneToMany(mappedBy = "role")
+    @OneToMany(mappedBy = "role") //One role can be assigned to many uesrs
     private List<User> users;
 }

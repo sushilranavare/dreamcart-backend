@@ -1,3 +1,6 @@
+/*
+* This entity represents the product available in a DreamCart system.
+* */
 package com.dreamcart.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,7 +28,7 @@ public class Product {
     private String description;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal price;
+    private BigDecimal price; //BigDecimal used to avoid precision problem.
 
     @Column(nullable = false)
     private Integer stockQuantity;
@@ -36,7 +39,7 @@ public class Product {
     @Column(nullable = false)
     private Boolean isActive = true;
 
-    @ManyToOne
+    @ManyToOne // product belongs to one category but one category can have many products.
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 }

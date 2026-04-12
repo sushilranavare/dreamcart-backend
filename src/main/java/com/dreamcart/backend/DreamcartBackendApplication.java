@@ -1,3 +1,7 @@
+/*
+* Main entry point of the DreamCart backend application.
+* Springboot starts the application frpm here and loads all configurations, compoonents and entities and repositories.
+* */
 package com.dreamcart.backend;
 
 import org.springframework.boot.SpringApplication;

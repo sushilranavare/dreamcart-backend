@@ -1,3 +1,8 @@
+/*
+* This entity represents the product category in the system.
+*
+* Ex., Electronics, Fashion,Books. This is easy for browse products using filter
+* */
 package com.dreamcart.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +28,6 @@ public class Category {
     @Column(length = 255)
     private String description;
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category") //One category can contain many products
     private List<Product> products;
 }
