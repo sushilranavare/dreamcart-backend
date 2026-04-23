@@ -1,3 +1,7 @@
+/*
+ * This class handles exceptions globally across the application.
+ * It ensures that the API returns clean and consistent JSON error responses.
+ */
 package com.dreamcart.backend.exceptions;
 
 import com.dreamcart.backend.dto.response.ErrorResponse;
