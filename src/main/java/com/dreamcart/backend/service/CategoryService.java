@@ -7,7 +7,9 @@ package com.dreamcart.backend.service;
 import com.dreamcart.backend.dto.request.CreateCategoryRequest;
 import com.dreamcart.backend.dto.request.UpdateCategoryRequest;
 import com.dreamcart.backend.dto.response.CategoryResponse;
+import com.dreamcart.backend.dto.response.ProductResponse;
 import com.dreamcart.backend.entity.Category;
+import com.dreamcart.backend.entity.Product;
 import com.dreamcart.backend.exceptions.ResourceNotFoundException;
 import com.dreamcart.backend.repository.CategoryRepository;
 import com.dreamcart.backend.repository.ProductRepository;
@@ -34,6 +36,16 @@ public class CategoryService {
                 .stream()
                 .map(this::mapToCategoryResponse)
                 .toList();
+    }
+
+       /* Fetches a single category by id.
+        * Throws an exception if the product does not exist.
+        */
+    public CategoryResponse getCategoryById(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+
+        return mapToCategoryResponse(category);
     }
     /*
      * Creates a new category after checking duplicate category names.

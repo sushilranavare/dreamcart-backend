@@ -13,7 +13,7 @@ import com.dreamcart.backend.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 @RestController
@@ -28,7 +28,9 @@ public class ProductController {
     /*
      * Returns a paginated list of products.
      * Optional query parameters can be used for search, filter, and sorting.
+     * Accessible by ADMIN and USER
      */
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping
     public ProductPageResponse getAllProducts(
         @RequestParam(defaultValue = "0") int page,
@@ -44,21 +46,27 @@ public class ProductController {
     }
     /*
      * Returns a single product by its id.
+     * Accessible by ADMIN and Users
      */
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/{id}")
     public ProductResponse getProductById(@PathVariable Long id) {
         return productService.getProductById(id);
     }
     /*
      * Creates a new product from validated request data.
+     * Accessible only by ADMIN users
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ProductResponse createProduct(@Valid @RequestBody CreateProductRequest request) {
         return productService.createProduct(request);
     }
     /*
      * Updates an existing product by id.
+     * Accessible only by ADMIN
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ProductResponse updateProduct(@PathVariable Long id,
                                          @Valid @RequestBody UpdateProductRequest request) {
@@ -66,7 +74,9 @@ public class ProductController {
     }
     /*
      * Deletes a product by id.
+     * Accessible ony by ADMIN
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);

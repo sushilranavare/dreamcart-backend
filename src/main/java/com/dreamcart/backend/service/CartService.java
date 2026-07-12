@@ -36,9 +36,9 @@ public class CartService {
     /**
      * Add product to cart.
      */
-    public CartItem addToCart(Long userId, AddToCartRequest request) {
+    public CartItem addToCart(String email, AddToCartRequest request) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
 

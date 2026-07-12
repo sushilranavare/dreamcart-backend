@@ -4,6 +4,8 @@ import com.dreamcart.backend.dto.request.AddToCartRequest;
 import com.dreamcart.backend.entity.CartItem;
 import com.dreamcart.backend.service.CartService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,18 +22,23 @@ public class CartController {
 
     /**
      * Add product to cart.
+     * Accessible by ADMIN
      */
+    @PreAuthorize("hasRole('USER')")
+
     @PostMapping("/add")
     public CartItem addToCart(
-            @RequestParam Long userId,
+            Authentication authentication,
             @Valid @RequestBody AddToCartRequest request) {
 
-        return cartService.addToCart(userId, request);
+        return cartService.addToCart(authentication.getName(), request);
     }
 
     /**
      * View cart.
+     * Accessible by USER
      */
+    @PreAuthorize("hasRole('USER')")
     @GetMapping
     public List<CartItem> getCart(
             @RequestParam Long userId) {
@@ -41,7 +48,9 @@ public class CartController {
 
     /**
      * Remove item.
+     * Accessible by USER
      */
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/items/{id}")
     public String removeItem(@PathVariable Long id) {
 
@@ -51,7 +60,9 @@ public class CartController {
 
     /**
      * Clear cart.
+     * Accessible by USER
      */
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/clear")
     public String clearCart(
             @RequestParam Long userId) {

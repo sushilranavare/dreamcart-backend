@@ -3,6 +3,7 @@ package com.dreamcart.backend.service;
 import com.dreamcart.backend.entity.*;
 import com.dreamcart.backend.exceptions.ResourceNotFoundException;
 import com.dreamcart.backend.repository.*;
+import jakarta.validation.constraints.Email;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -33,9 +34,9 @@ public class OrderService {
     /**
      * Places an order using all items currently in the user's cart.
      */
-    public Order placeOrder(Long userId) {
+    public Order placeOrder(String email) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
 
@@ -90,9 +91,9 @@ public class OrderService {
     /**
      * Returns all orders for a user.
      */
-    public List<Order> getOrders(Long userId) {
+    public List<Order> getOrders(String email) {
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
 

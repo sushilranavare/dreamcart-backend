@@ -10,12 +10,16 @@ import com.dreamcart.backend.repository.RoleRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.dreamcart.backend.entity.User;
+import com.dreamcart.backend.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class DataInitializer {
 
     @Bean
-    CommandLineRunner initData(RoleRepository roleRepository, CategoryRepository categoryRepository){
+    CommandLineRunner initData(RoleRepository roleRepository, CategoryRepository categoryRepository,
+                               UserRepository userRepository, PasswordEncoder passwordEncoder){
         return args -> {
             // Insert roles if not present
             if(roleRepository.findByName("ADMIN").isEmpty()){
@@ -41,6 +45,26 @@ public class DataInitializer {
                                 .description("Books across different genres")
                                 .build()
                 );
+            }
+            // Insert default admin user if not present
+            if (userRepository.findByEmail("admin@dreamcart.com").isEmpty()) {
+
+                Role adminRole = roleRepository.findByName("ADMIN")
+                        .orElseThrow(() -> new RuntimeException("ADMIN role not found"));
+
+                userRepository.save(
+                        User.builder()
+                                .firstName("Admin")
+                                .lastName("DreamCart")
+                                .email("admin@dreamcart.com")
+                                .password(passwordEncoder.encode("Admin@123"))
+                                .phoneNumber("9999999999")
+                                .isActive(true)
+                                .role(adminRole)
+                                .build()
+                );
+
+                System.out.println("Default ADMIN user created.");
             }
         };
     }
