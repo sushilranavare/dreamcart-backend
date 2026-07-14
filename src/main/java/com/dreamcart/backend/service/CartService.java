@@ -11,6 +11,7 @@ import com.dreamcart.backend.repository.ProductRepository;
 import com.dreamcart.backend.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
 
 @Service
@@ -21,16 +22,20 @@ public class CartService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
 
+
+
     public CartService(
             CartRepository cartRepository,
             CartItemRepository cartItemRepository,
             ProductRepository productRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository
+            ) {
 
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+
     }
 
     /**

@@ -3,8 +3,10 @@ package com.dreamcart.backend.service;
 import com.dreamcart.backend.entity.*;
 import com.dreamcart.backend.exceptions.ResourceNotFoundException;
 import com.dreamcart.backend.repository.*;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.Email;
 import org.springframework.stereotype.Service;
+import com.dreamcart.backend.repository.ShippingAddressRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,27 +20,44 @@ public class OrderService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final OrderRepository orderRepository;
-
+    private final ShippingAddressRepository shippingAddressRepository;
+    
     public OrderService(
             UserRepository userRepository,
             CartRepository cartRepository,
             CartItemRepository cartItemRepository,
-            OrderRepository orderRepository) {
+            OrderRepository orderRepository,
+            ShippingAddressRepository  shippingAddressRepository) {
 
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.orderRepository = orderRepository;
+        this.shippingAddressRepository = shippingAddressRepository;
     }
 
     /**
      * Places an order using all items currently in the user's cart.
      */
-    public Order placeOrder(String email) {
+    @Transactional
+    public Order placeOrder(String email, Long addressId) {
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("User not found"));
+
+        ShippingAddress address =
+            shippingAddressRepository
+                        .findByIdAndUser(addressId, user)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Shipping address not found"));
+
+        Order order = new Order();
+
+        order.setUser(user);
+        order.setShippingAddress(address);
+        order.setOrderDate(LocalDateTime.now());
+        order.setStatus("PLACED");
 
         Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() ->
@@ -49,11 +68,6 @@ public class OrderService {
         if (cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");
         }
-
-        Order order = new Order();
-        order.setUser(user);
-        order.setOrderDate(LocalDateTime.now());
-        order.setStatus("PLACED");
 
         List<OrderItem> orderItems = new ArrayList<>();
 

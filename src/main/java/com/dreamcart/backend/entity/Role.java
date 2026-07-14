@@ -8,6 +8,8 @@ package com.dreamcart.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "roles")
@@ -25,6 +27,8 @@ public class Role {
     @Column(nullable = false, unique = true, length = 50)
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "role") //One role can be assigned to many uesrs
     private List<User> users;
+
 }

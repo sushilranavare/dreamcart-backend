@@ -1,5 +1,7 @@
 package com.dreamcart.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +30,15 @@ public class Order {
 
     private String status;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
+
+    /*
+     * Shipping address selected by the user
+     * when placing the order.
+     */
+    @ManyToOne
+    @JoinColumn(name = "shipping_address_id")
+    private ShippingAddress shippingAddress;
 }

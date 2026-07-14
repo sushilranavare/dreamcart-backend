@@ -4,6 +4,7 @@
 * Ex., Electronics, Fashion,Books. This is easy for browse products using filter
 * */
 package com.dreamcart.backend.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -28,6 +29,7 @@ public class Category {
     @Column(length = 255)
     private String description;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "category") //One category can contain many products
     private List<Product> products;
 }

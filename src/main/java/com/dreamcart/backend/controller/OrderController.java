@@ -4,8 +4,10 @@
  */
 package com.dreamcart.backend.controller;
 
+import com.dreamcart.backend.dto.request.PlaceOrderRequest;
 import com.dreamcart.backend.entity.Order;
 import com.dreamcart.backend.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +30,11 @@ public class OrderController {
      */
     @PreAuthorize("hasRole('USER')")
     @PostMapping
-    public Order placeOrder(Authentication authentication) {
-        return orderService.placeOrder(authentication.getName());
+    public Order placeOrder(Authentication authentication,
+                            @Valid
+                            @RequestBody
+                            PlaceOrderRequest request) {
+        return orderService.placeOrder(authentication.getName(), request.getAddressId());
 
 
     }
@@ -50,7 +55,7 @@ public class OrderController {
      */
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}")
-    public Order getOrder(Authentication authentication) {
-        return orderService.placeOrder(authentication.getName());
+    public Order getOrder(@PathVariable Long id ) {
+        return orderService.getOrder(id);
     }
 }
