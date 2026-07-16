@@ -13,4 +13,8 @@ public interface ReviewRepository  extends JpaRepository<Review, Long>{
 
     Optional<Review> findByUserAndProduct(User user, Product product);
 
+    /* Returns total reviews*/
+
+    @Override
+    long count();
 }

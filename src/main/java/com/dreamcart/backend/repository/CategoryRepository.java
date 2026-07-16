@@ -9,5 +9,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    Optional<Category> findByName(String name);//Used to find a category by its name
+    Optional<Category> findByName(String name);//Used to find a category by its name.
+
+    /* Returns total number of registered categories.*/
+
+    @Override
+    long count();
 }

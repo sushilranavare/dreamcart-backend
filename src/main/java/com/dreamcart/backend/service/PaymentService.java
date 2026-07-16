@@ -20,13 +20,16 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
+    private final EmailService emailService;
 
     public PaymentService(
             PaymentRepository paymentRepository,
-            OrderRepository orderRepository) {
+            OrderRepository orderRepository,
+            EmailService emailService ) {
 
         this.paymentRepository = paymentRepository;
         this.orderRepository = orderRepository;
+        this.emailService = emailService;
     }
 
     /*
@@ -65,12 +68,33 @@ public class PaymentService {
         /*
          * Update order status after successful payment.
          */
-        order.setStatus("CONFIRMED");
+       // order.setStatus("CONFIRMED");
 
+        //orderRepository.save(order);
+
+        //return paymentRepository.save(payment);
+
+        /* Update order status after successful payment. */
+
+        order.setStatus("CONFIRMED");
         orderRepository.save(order);
 
-        return paymentRepository.save(payment);
+        /* Save payment Information */
+        Payment savedPayment = paymentRepository.save(payment);
+
+        /* Send confimation mail in the background */
+
+         emailService.sendOrderConfirmationEmail(
+                 order.getUser().getEmail(),
+                 order.getId(),
+                 order.getUser().getFirstName(),
+                 order.getTotalAmount().toString()
+         );
+
+         /* Return saved payment details */
+        return savedPayment;
     }
+
 
     /*
      * Returns payment details by payment ID.

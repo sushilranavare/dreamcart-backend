@@ -10,4 +10,8 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository <User, Long>{
     Optional<User> findByEmail(String email); //Used to check whether the user exists with the given email.
+
+    /*Returns total number of registered users.*/
+    @Override
+    long count();
 }
