@@ -1,6 +1,9 @@
 package com.dreamcart.backend.controller;
 
 import com.dreamcart.backend.dto.request.AddToCartRequest;
+import com.dreamcart.backend.dto.request.UpdateCartItemRequest;
+import com.dreamcart.backend.dto.response.CartItemResponse;
+import com.dreamcart.backend.dto.response.CartResponse;
 import com.dreamcart.backend.entity.CartItem;
 import com.dreamcart.backend.service.CartService;
 import jakarta.validation.Valid;
@@ -40,22 +43,28 @@ public class CartController {
      */
     @PreAuthorize("hasRole('USER')")
     @GetMapping
-    public List<CartItem> getCart(
-            @RequestParam Long userId) {
-
-        return cartService.getCart(userId);
+    public CartResponse getCart(Authentication authentication){
+        return (CartResponse) cartService.getCart(authentication.getName());
     }
 
+    // Update cart item quantity, Accessible by USER.
+    @PreAuthorize("hasRole('USER')")
+    @PutMapping("/items/{id}")
+    public CartResponse updateQuantity(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateCartItemRequest request) {
+        return cartService.updateQuantity(authentication.getName(), id, request);
+    }
     /**
      * Remove item.
      * Accessible by USER
      */
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/items/{id}")
-    public String removeItem(@PathVariable Long id) {
+    public CartResponse removeItem( Authentication authentication, @PathVariable Long id) {
 
-        cartService.removeItem(id);
-        return "Item removed successfully";
+        return cartService.removeItem(authentication.getName(), id);
     }
 
     /**
@@ -64,10 +73,8 @@ public class CartController {
      */
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/clear")
-    public String clearCart(
-            @RequestParam Long userId) {
+    public CartResponse clearCart(Authentication authentication) {
 
-        cartService.clearCart(userId);
-        return "Cart cleared successfully";
+        return cartService.clearCart(authentication.getName());
     }
 }
