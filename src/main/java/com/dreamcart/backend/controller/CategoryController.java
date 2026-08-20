@@ -28,16 +28,16 @@ public class CategoryController {
     }
     /*
      * Returns all available categories.
-     * Accessible by ADMIN and USER
+     * Accessible by ADMIN and USER Correction ==> (Accessible to all)
      */
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping
     public List<CategoryResponse> getAllCategories() {
         return categoryService.getAllCategories();
     }
 
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+   // @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/{id}")
     public CategoryResponse getCategoryById(@PathVariable Long id) {
         return categoryService.getCategoryById(id);

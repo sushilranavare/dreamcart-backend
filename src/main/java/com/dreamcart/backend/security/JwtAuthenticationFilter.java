@@ -18,7 +18,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 
 @Component
@@ -34,7 +33,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtService = jwtService;
         this.customUserDetailsService = customUserDetailsService;
     }
+    protected boolean shouldNotFilter(
+            HttpServletRequest request) {
 
+        String path =
+                request.getServletPath();
+
+        return path.equals(
+                "/api/auth/login"
+        )
+                ||
+                path.equals(
+                        "/api/auth/register"
+                );
+    }
     /**
      * Validates JWT token for every incoming request.
      */
@@ -45,44 +57,82 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String email;
+        String authHeader =
+                request.getHeader(
+                        "Authorization"
+                );
 
-        // Skip if Authorization header is missing
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+        if (authHeader == null
+                ||
+                !authHeader.startsWith(
+                        "Bearer "
+                )) {
+
+            filterChain.doFilter(
+                    request,
+                    response
+            );
+
             return;
         }
 
-        jwt = authHeader.substring(7);
+        String jwt =
+                authHeader.substring(7);
 
-        email = jwtService.extractEmail(jwt);
+        String email;
+        try {
+            email = jwtService.extractEmail(jwt);
 
-        if (email != null &&
-                SecurityContextHolder.getContext().getAuthentication() == null) {
+        }
+        catch (Exception exception) {
+            filterChain.doFilter(request, response);
+            return;
+
+        }
+        // Only Authenticate if the request does not already have an authenticated user.
+        if (email != null
+                &&
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        == null) {
 
             UserDetails userDetails =
-                    customUserDetailsService.loadUserByUsername(email);
+                    customUserDetailsService
+                            .loadUserByUsername(
+                                    email
+                            );
 
-            if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
+            if (jwtService.isTokenValid(
+                    jwt,
+                    userDetails.getUsername()
+            )) {
 
-                UsernamePasswordAuthenticationToken authentication =
+                UsernamePasswordAuthenticationToken
+                        authentication =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
-                                userDetails.getAuthorities());
+                                userDetails
+                                        .getAuthorities()
+                        );
 
                 authentication.setDetails(
                         new WebAuthenticationDetailsSource()
-                                .buildDetails(request));
+                                .buildDetails(request)
+                );
 
                 SecurityContextHolder
                         .getContext()
-                        .setAuthentication(authentication);
+                        .setAuthentication(
+                                authentication
+                        );
             }
         }
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(
+                request,
+                response
+        );
     }
 }

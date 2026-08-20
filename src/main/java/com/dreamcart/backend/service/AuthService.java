@@ -54,20 +54,47 @@ public class AuthService {
         userRepository.save(user);
 
         String token = jwtService.generateToken(user.getEmail());
-        return new AuthResponse(token, "User registered successfully");
+        return new AuthResponse(token, userRole.getName(), "User registered successfully");
     }
 
     //Registers a new user after checking whether the email is already used.
     // Password is stored in encrypted form, and the default USER role is assigned.
+//    public AuthResponse login(LoginRequest request) {
+//        User user = userRepository.findByEmail(request.getEmail())
+//                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+//
+//        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+//            throw new RuntimeException("Invalid email or password");
+//        }
+//
+//        String token = jwtService.generateToken(user.getEmail());
+//        return new AuthResponse(token, "Login successful");
+//    }
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() ->
+                        new RuntimeException("Invalid email or password")
+                );
+
+        if (!passwordEncoder.matches(
+                request.getPassword(),
+                user.getPassword()
+        )) {
+            throw new RuntimeException(
+                    "Invalid email or password"
+            );
         }
 
-        String token = jwtService.generateToken(user.getEmail());
-        return new AuthResponse(token, "Login successful");
+        String token =
+                jwtService.generateToken(
+                        user.getEmail()
+                );
+
+        return new AuthResponse(
+                token,
+                user.getRole().getName(),
+                "Login successful"
+        );
     }
 }

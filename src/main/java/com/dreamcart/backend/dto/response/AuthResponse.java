@@ -16,6 +16,11 @@ public class AuthResponse {
     // JWT token generated after successful authentication
     private String token;
 
+    //Authenticated users role
+    private String role;
+
     // Success message for registration or login
     private String message;
+
+
 }

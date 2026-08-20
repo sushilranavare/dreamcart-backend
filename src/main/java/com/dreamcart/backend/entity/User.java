@@ -44,5 +44,6 @@ public class User {
     private Role role;
 
     public void setIsActive(boolean b) {
+        this.isActive = b;
     }
 }

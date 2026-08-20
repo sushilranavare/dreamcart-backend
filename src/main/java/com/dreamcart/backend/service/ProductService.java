@@ -19,8 +19,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 
@@ -32,10 +34,13 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ImageStorageService imageStorageService;
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, ImageStorageService imageStorageService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
+        this.imageStorageService = imageStorageService;
     }
     /*
      * Returns a paginated list of products based on optional search, filter,
@@ -52,6 +57,8 @@ public class ProductService {
         if (!allowedSortFields.contains(sortBy)) {
             sortBy = "id";
         }
+
+
 
         Sort sort = sortDir.equalsIgnoreCase("desc")
                 ? Sort.by(sortBy).descending()
@@ -100,18 +107,22 @@ public class ProductService {
     /*
      * Creates a new product and links it to the selected category.
      */
-    public ProductResponse createProduct(CreateProductRequest request) {
+    public ProductResponse createProduct(CreateProductRequest request, MultipartFile image) throws IOException {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + request.getCategoryId()));
+
+
+        String imageUrl = imageStorageService.saveImage(image);
 
         Product product = new Product();
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setStockQuantity(request.getStockQuantity());
-        product.setImageUrl(request.getImageUrl());
+        product.setImageUrl(imageUrl);
         product.setIsActive(true);
         product.setCategory(category);
+
 
         Product savedProduct = productRepository.save(product);
         return mapToProductResponse(savedProduct);
@@ -134,6 +145,7 @@ public class ProductService {
         product.setImageUrl(request.getImageUrl());
         product.setIsActive(request.getIsActive());
         product.setCategory(category);
+
 
         Product updatedProduct = productRepository.save(product);
         return mapToProductResponse(updatedProduct);

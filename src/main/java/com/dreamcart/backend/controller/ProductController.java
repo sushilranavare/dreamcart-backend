@@ -14,6 +14,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -30,7 +33,7 @@ public class ProductController {
      * Optional query parameters can be used for search, filter, and sorting.
      * Accessible by ADMIN and USER
      */
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+
     @GetMapping
     public ProductPageResponse getAllProducts(
         @RequestParam(defaultValue = "0") int page,
@@ -58,9 +61,10 @@ public class ProductController {
      * Accessible only by ADMIN users
      */
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping
-    public ProductResponse createProduct(@Valid @RequestBody CreateProductRequest request) {
-        return productService.createProduct(request);
+    @PostMapping(consumes = "multipart/form-data")
+    public ProductResponse createProduct(@Valid @RequestPart("product") CreateProductRequest request,
+                                         @RequestPart("image") MultipartFile image) throws IOException {
+        return productService.createProduct(request, image);
     }
     /*
      * Updates an existing product by id.
