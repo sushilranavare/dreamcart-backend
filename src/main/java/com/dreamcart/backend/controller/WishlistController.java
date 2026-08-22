@@ -1,14 +1,9 @@
-/*
- * This controller exposes REST APIs for wishlist management.
- * Only authenticated users with USER role can manage their wishlist.
- */
 package com.dreamcart.backend.controller;
 
 import com.dreamcart.backend.dto.request.WishlistRequest;
-import com.dreamcart.backend.entity.Wishlist;
+import com.dreamcart.backend.dto.response.WishlistResponse;
 import com.dreamcart.backend.service.WishlistService;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -25,47 +20,25 @@ public class WishlistController {
         this.wishlistService = wishlistService;
     }
 
-    /*
-     * Adds a product to the authenticated user's wishlist.
-     */
-    @PreAuthorize("hasRole('USER')")
-    @PostMapping
-    public ResponseEntity<Wishlist> addToWishlist(
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @PostMapping("/add")
+    public List<WishlistResponse> addToWishlist(
             Authentication authentication,
             @Valid @RequestBody WishlistRequest request) {
-
-        return ResponseEntity.ok(
-                wishlistService.addToWishlist(authentication.getName(), request)
-        );
+        return wishlistService.addToWishlist(authentication.getName(), request);
     }
 
-    /*
-     * Returns all wishlist items of the authenticated user.
-     */
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping
-    public ResponseEntity<List<Wishlist>> getWishlist(
-            Authentication authentication) {
-
-        return ResponseEntity.ok(
-                wishlistService.getWishlist(authentication.getName())
-        );
+    public List<WishlistResponse> getWishlist(Authentication authentication) {
+        return wishlistService.getWishlist(authentication.getName());
     }
 
-    /*
-     * Removes a product from the authenticated user's wishlist.
-     */
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @DeleteMapping("/{productId}")
-    public ResponseEntity<String> removeFromWishlist(
+    public List<WishlistResponse> removeFromWishlist(
             Authentication authentication,
             @PathVariable Long productId) {
-
-        wishlistService.removeFromWishlist(
-                authentication.getName(),
-                productId
-        );
-
-        return ResponseEntity.ok("Product removed from wishlist successfully.");
+        return wishlistService.removeFromWishlist(authentication.getName(), productId);
     }
 }
