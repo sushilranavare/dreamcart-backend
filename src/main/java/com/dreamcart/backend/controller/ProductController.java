@@ -51,7 +51,6 @@ public class ProductController {
      * Returns a single product by its id.
      * Accessible by ADMIN and Users
      */
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/{id}")
     public ProductResponse getProductById(@PathVariable Long id) {
         return productService.getProductById(id);
