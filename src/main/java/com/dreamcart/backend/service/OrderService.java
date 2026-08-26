@@ -21,19 +21,21 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final OrderRepository orderRepository;
     private final ShippingAddressRepository shippingAddressRepository;
+    private final ProductRepository productRepository;
     
     public OrderService(
             UserRepository userRepository,
             CartRepository cartRepository,
             CartItemRepository cartItemRepository,
             OrderRepository orderRepository,
-            ShippingAddressRepository  shippingAddressRepository) {
+            ShippingAddressRepository  shippingAddressRepository, ProductRepository productRepository) {
 
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.orderRepository = orderRepository;
         this.shippingAddressRepository = shippingAddressRepository;
+        this.productRepository = productRepository;
     }
 
     /**
@@ -75,6 +77,19 @@ public class OrderService {
 
         for (CartItem item : cartItems) {
 
+            //Fetch product with pessimistic lock
+            Product lockedProduct = productRepository.findByIdWithLock(item.getProduct().getId())
+                    .orElseThrow(() -> new RuntimeException("Product Not Found"));
+
+            //Validate Stock while holding the stock
+            if(lockedProduct.getStockQuantity() < item.getQuantity()) {
+                throw new RuntimeException("Inssufficient stock for product" + lockedProduct.getName());
+            }
+
+            //Deduct the stock
+            lockedProduct.setStockQuantity(lockedProduct.getStockQuantity() - item.getQuantity());
+            productRepository.save(lockedProduct);
+            
             OrderItem orderItem = new OrderItem();
 
             orderItem.setOrder(order);
@@ -122,5 +137,24 @@ public class OrderService {
         return orderRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Order not found"));
+    }
+    /**
+     * Returns all orders in the system.
+     * (Used by Admin)
+     */
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
+
+    /**
+     * Updates the status of a specific order.
+     * (Used by Admin)
+     */
+    public Order updateOrderStatus(Long id, String status) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        order.setStatus(status);
+        return orderRepository.save(order);
     }
 }

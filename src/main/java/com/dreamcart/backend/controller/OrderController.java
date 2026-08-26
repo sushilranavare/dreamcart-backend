@@ -58,4 +58,25 @@ public class OrderController {
     public Order getOrder(@PathVariable Long id ) {
         return orderService.getOrder(id);
     }
+
+    /**
+     * Get all orders in the system.
+     * Accessible only by ADMIN
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/all")
+    public List<Order> getAllOrders() {
+        return orderService.getAllOrders();
+    }
+
+    /**
+     * Update an order's status.
+     * Accessible only by ADMIN
+     */
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/status")
+    public Order updateOrderStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> request) {
+        String newStatus = request.get("status");
+        return orderService.updateOrderStatus(id, newStatus);
+    }
 }
