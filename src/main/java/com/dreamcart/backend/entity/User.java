@@ -6,6 +6,9 @@
 package com.dreamcart.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -30,6 +33,7 @@ public class User {
     @Column(nullable = false, unique = true, length = 150) //Email is unique so no two user can login with same email.
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -42,6 +46,14 @@ public class User {
     @ManyToOne  // many users can share the same role, Ex. USER or ADMIN
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
+
+    @JsonIgnore // Stops the infinite loop!
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Cart cart;
+
+    @JsonIgnore // Stops the infinite loop!
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Order> orders;
 
     public void setIsActive(boolean b) {
         this.isActive = b;
