@@ -31,7 +31,7 @@ public class AdminDashboardService {
             OrderRepository orderRepository,
             ReviewRepository reviewRepository,
             WishlistRepository wishlistRepository
-        )
+    )
     {
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
@@ -56,7 +56,7 @@ public class AdminDashboardService {
                 .totalWishlistItems(wishlistRepository.count())
                 .totalRevenue(totalRevenue)
                 .placedOrders(orderRepository.countByStatus("PLACED"))
-                .totalOrders(orderRepository.countByStatus("CONFIRMED"))
+                .confirmedOrders(orderRepository.countByStatus("CONFIRMED"))
                 .build();
     }
 
