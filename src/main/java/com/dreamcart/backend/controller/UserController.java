@@ -1,9 +1,13 @@
 package com.dreamcart.backend.controller;
 
+import com.dreamcart.backend.dto.request.ChangePasswordRequest;
+import com.dreamcart.backend.dto.request.UpdateProfileRequest;
 import com.dreamcart.backend.entity.User;
 import com.dreamcart.backend.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,5 +35,46 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /*
+     * Get the profile of the currently authenticated user.
+     * Accessible by any logged-in user (USER or ADMIN).
+     */
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/me")
+    public ResponseEntity<User> getProfile(Authentication authentication) {
+        return ResponseEntity.ok(
+                userService.getProfile(authentication.getName())
+        );
+    }
+
+    /*
+     * Update the profile (name, phone) of the currently authenticated user.
+     * Accessible by any logged-in user (USER or ADMIN).
+     */
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/me")
+    public ResponseEntity<User> updateProfile(
+            Authentication authentication,
+            @Valid @RequestBody UpdateProfileRequest request) {
+
+        return ResponseEntity.ok(
+                userService.updateProfile(authentication.getName(), request)
+        );
+    }
+
+    /*
+     * Change the password of the currently authenticated user.
+     * Requires the current password to be provided and correct.
+     */
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/me/password")
+    public ResponseEntity<String> changePassword(
+            Authentication authentication,
+            @Valid @RequestBody ChangePasswordRequest request) {
+
+        userService.changePassword(authentication.getName(), request);
+        return ResponseEntity.ok("Password updated successfully.");
     }
 }
