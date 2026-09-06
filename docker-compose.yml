@@ -30,6 +30,12 @@ services:
       SPRING_DATASOURCE_PASSWORD: admin
     ports:
       - "8080:8080"
+    volumes:
+      # Uploaded product images are written to /app/uploads/products
+      # inside the container. Without this volume they would live only
+      # in the container's own filesystem and be lost whenever the
+      # container is recreated.
+      - dreamcart-uploads:/app/uploads
 
   frontend:
     build:
@@ -42,3 +48,4 @@ services:
 
 volumes:
   dreamcart-postgres-data:
+  dreamcart-uploads:
