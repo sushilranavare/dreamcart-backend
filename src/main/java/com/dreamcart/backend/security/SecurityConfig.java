@@ -19,6 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Value;
+import java.util.Arrays;
 
 import java.util.List;
 
@@ -27,6 +29,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    // Comma-separated allowed origins, configurable via the
+    // app.cors.allowed-origins property (APP_CORS_ALLOWED_ORIGINS env var).
+    @Value("${app.cors.allowed-origins}")
+    private String allowedOrigins;
 
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter
@@ -134,10 +141,14 @@ public class SecurityConfig {
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
-        // React Vite development server
+        // Split the comma-separated origins property into a list,
+        // trimming whitespace around each one.
         configuration.setAllowedOrigins(
-                List.of("http://localhost:5173")
+                Arrays.stream(allowedOrigins.split(","))
+                        .map(String::trim)
+                        .toList()
         );
+
 
         configuration.setAllowedMethods(
                 List.of(
